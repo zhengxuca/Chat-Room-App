@@ -1,0 +1,25 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#popup {
+    z-index:1;
+    border:3px solid green;
+    background-color: cadetblue;
+    margin: auto;
+    width: 50%;
+}
+
+#welcome {
+      margin: auto;
+      width:50%;
+}
+
+#logout {
+    visibility: hidden;
+}
