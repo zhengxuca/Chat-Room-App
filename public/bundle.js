@@ -61,11 +61,11 @@
 	            { id: 'popup' },
 	            "username",
 	            React.createElement('br', null),
-	            React.createElement('input', { type: 'text', name: 'username' }),
+	            React.createElement('input', { type: 'text', id: 'usernameInput', name: 'username' }),
 	            React.createElement('br', null),
 	            "password:",
 	            React.createElement('br', null),
-	            React.createElement('input', { type: 'text', name: 'password' }),
+	            React.createElement('input', { type: 'text', id: 'passwordInput', name: 'password' }),
 	            React.createElement('br', null),
 	            React.createElement(
 	                'button',
@@ -89,36 +89,57 @@
 	        $("#RegLoginGroup").show();
 	    };
 
+	    $("#logout").click(function () {
+	        //delete token from cookies
+
+
+	        $("#RegLoginGroup").show();
+	        $("#logout").hide();
+	    });
+
 	    $("#registerButton").click(function () {
 	        $("#popupHolder").show();
+	        $("#RegLoginGroup").hide();
+	        var handler = function () {
+	            $("#popupHolder").hide();
 
+	            var data = {
+	                username: $("#usernameInput").val(),
+	                password: $("#passwordInput").val()
+	            };
+
+	            $.post("/users/register", data, function (data, status) {
+	                alert("Data: " + data + "\nStatus: " + status);
+	                $("#logout").show();
+	            }).fail(function () {
+	                $("#RegLoginGroup").show();
+	            });
+	        };
+
+	        ReactDOM.render(React.createElement(RegLogin, { action: 'Register', handler: handler, cancel: cancel }), document.getElementById('popupHolder'));
+	    });
+
+	    $("#loginButton").click(function () {
+	        $("#popupHolder").show();
+	        $("#RegLoginGroup").hide();
 	        var handler = function () {
 	            $("#popupHolder").hide();
 	            $("#RegLoginGroup").show();
 
 	            var data = {
-	                username: "abc",
-	                password: "1234"
+	                username: $("#usernameInput").val(),
+	                password: $("#passwordInput").val()
 	            };
 
-	            $.post("/users/register", data, function (data, status) {
+	            $.post("/users/login", data, function (data, status) {
 	                alert("Data: " + data + "\nStatus: " + status);
+	                $("#logout").show();
+	            }).fail(function () {
+	                $("#RegLoginGroup").show();
 	            });
 	        };
 
-	        ReactDOM.render(React.createElement(RegLogin, { action: 'Register', handler: handler, cancel: cancel }), document.getElementById('popupHolder'));
-	        $("#RegLoginGroup").hide();
-	    });
-
-	    $("#loginButton").click(function () {
-	        $("#popupHolder").show();
-	        var handler = function () {
-	            $("#popupHolder").hide();
-	            $("#RegLoginGroup").show();
-	        };
-
 	        ReactDOM.render(React.createElement(RegLogin, { action: 'Login', handler: handler, cancel: cancel }), document.getElementById('popupHolder'));
-	        $("#RegLoginGroup").hide();
 	    });
 	});
 
@@ -157,7 +178,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n", ""]);
+	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n#logout {\n    visibility: hidden;\n}\n", ""]);
 
 	// exports
 
