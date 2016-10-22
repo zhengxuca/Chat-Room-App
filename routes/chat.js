@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
+var verify = require("./verify");
 
 /* GET home page. */
-router.get('/', function (req, res) {
+router.get('/', verify.verifyOrdinaryUser, function( req, res, next) {
+
     res.status(200);
     res.write("chat app");
     console.log("chat app");

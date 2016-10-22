@@ -82,8 +82,33 @@
 
 	});
 
-	$(document).ready(function () {
+	function getCookie(cname) {
+	    var name = cname + "=";
+	    var ca = document.cookie.split(';');
+	    for (var i = 0; i < ca.length; i++) {
+	        var c = ca[i];
+	        while (c.charAt(0) == ' ') {
+	            c = c.substring(1);
+	        }
+	        if (c.indexOf(name) == 0) {
+	            return c.substring(name.length, c.length);
+	        }
+	    }
+	    return "";
+	}
 
+	function startChat() {
+	    var token = getCookie("token");
+	    var data = { token: token };
+	    $.getJSON("/chat", data, function (data) {
+	        console.log(data);
+	    }).fail(function () {
+	        console.log('failed chat');
+	    });
+	}
+
+	$(document).ready(function () {
+	    $("#logout").hide();
 	    var cancel = function () {
 	        $("#popupHolder").hide();
 	        $("#RegLoginGroup").show();
@@ -92,9 +117,9 @@
 	    $("#logout").click(function () {
 	        //delete token from cookies
 
-
 	        $("#RegLoginGroup").show();
 	        $("#logout").hide();
+	        document.cookie = "";
 	    });
 
 	    $("#registerButton").click(function () {
@@ -109,8 +134,11 @@
 	            };
 
 	            $.post("/users/register", data, function (data, status) {
-	                alert("Data: " + data + "\nStatus: " + status);
+	                // alert("Data: " + data + "\nStatus: " + status);
+	                console.log(JSON.stringify(data));
 	                $("#logout").show();
+	                document.cookie = "token=" + data.token;
+	                startChat();
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
 	            });
@@ -124,7 +152,6 @@
 	        $("#RegLoginGroup").hide();
 	        var handler = function () {
 	            $("#popupHolder").hide();
-	            $("#RegLoginGroup").show();
 
 	            var data = {
 	                username: $("#usernameInput").val(),
@@ -132,8 +159,10 @@
 	            };
 
 	            $.post("/users/login", data, function (data, status) {
-	                alert("Data: " + data + "\nStatus: " + status);
+	                console.log(JSON.stringify(data));
 	                $("#logout").show();
+	                document.cookie = "token=" + data.token;
+	                startChat();
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
 	            });
@@ -178,7 +207,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n#logout {\n    visibility: hidden;\n}\n", ""]);
+	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n", ""]);
 
 	// exports
 

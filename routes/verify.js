@@ -23,7 +23,8 @@ exports.verifyOrdinaryUser = function (req, res, next) {
             } else {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
-                next();
+                return next(null);
+
             }
         });
     } else {
@@ -31,6 +32,6 @@ exports.verifyOrdinaryUser = function (req, res, next) {
         // return an error
         var err = new Error('No token provided!');
         err.status = 403;
-        return next(err);
+        next(err);
     }
 };
