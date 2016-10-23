@@ -1,4 +1,5 @@
 var webpack = require("webpack");
+
 module.exports = {
     entry: "./public/javascripts/chatScripts.js",
     output: {
@@ -16,7 +17,14 @@ module.exports = {
             "process.env": {
                 NODE_ENV: JSON.stringify("production")
             }
+        }),
+        
+        /*
+        new webpack.optimize.UglifyJsPlugin({
+            compress: { warnings: false }
         })
-
+        */
     ]
+
+
 };

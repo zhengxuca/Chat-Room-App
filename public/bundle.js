@@ -47,6 +47,7 @@
 	__webpack_require__(1);
 	var React = __webpack_require__(5);
 	var ReactDOM = __webpack_require__(34);
+	var chat = __webpack_require__(167);
 
 	var RegLogin = React.createClass({
 	    displayName: 'RegLogin',
@@ -82,31 +83,6 @@
 
 	});
 
-	function getCookie(cname) {
-	    var name = cname + "=";
-	    var ca = document.cookie.split(';');
-	    for (var i = 0; i < ca.length; i++) {
-	        var c = ca[i];
-	        while (c.charAt(0) == ' ') {
-	            c = c.substring(1);
-	        }
-	        if (c.indexOf(name) == 0) {
-	            return c.substring(name.length, c.length);
-	        }
-	    }
-	    return "";
-	}
-
-	function startChat() {
-	    var token = getCookie("token");
-	    var data = { token: token };
-	    $.getJSON("/chat", data, function (data) {
-	        console.log(data);
-	    }).fail(function () {
-	        console.log('failed chat');
-	    });
-	}
-
 	$(document).ready(function () {
 	    $("#logout").hide();
 	    var cancel = function () {
@@ -138,7 +114,7 @@
 	                console.log(JSON.stringify(data));
 	                $("#logout").show();
 	                document.cookie = "token=" + data.token;
-	                startChat();
+	                chat.startChat();
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
 	            });
@@ -162,7 +138,8 @@
 	                console.log(JSON.stringify(data));
 	                $("#logout").show();
 	                document.cookie = "token=" + data.token;
-	                startChat();
+	                console.log(chat);
+	                chat.startChat();
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
 	            });
@@ -20904,6 +20881,37 @@
 	var ReactMount = __webpack_require__(159);
 
 	module.exports = ReactMount.renderSubtreeIntoContainer;
+
+/***/ },
+/* 167 */
+/***/ function(module, exports) {
+
+	module.exports = new function () {
+	    this.socket = null;
+	    this.startChat = function () {
+	        var token = this.getCookie("token");
+	        socket = io({ query: "token=" + token });
+	    };
+
+	    this.endChat = function () {
+	        socket.emit("disconnect");
+	    };
+
+	    this.getCookie = function (cname) {
+	        var name = cname + "=";
+	        var ca = document.cookie.split(';');
+	        for (var i = 0; i < ca.length; i++) {
+	            var c = ca[i];
+	            while (c.charAt(0) == ' ') {
+	                c = c.substring(1);
+	            }
+	            if (c.indexOf(name) == 0) {
+	                return c.substring(name.length, c.length);
+	            }
+	        }
+	        return "";
+	    };
+	}();
 
 /***/ }
 /******/ ]);

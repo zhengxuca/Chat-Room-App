@@ -1,7 +1,9 @@
 require("../stylesheets/style.css");
 var React = require('react');
 var ReactDOM = require('react-dom');
-var ChatHandlers = require("./ChatHandlers.js");
+var chat = require("./ChatClient.js");
+
+
 
 var RegLogin = React.createClass(
     {
@@ -30,30 +32,8 @@ var RegLogin = React.createClass(
 
 );
 
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
 
-function startChat() {
-    var token =getCookie("token");
-    var data = {token: token};
-    $.getJSON("/chat", data, function(data) {
-        console.log(data);
-    }).fail(function() {
-        console.log('failed chat');
-    });
-}
+
 
 $(document).ready(function () {
     $("#logout").hide();
@@ -86,7 +66,7 @@ $(document).ready(function () {
                 console.log(JSON.stringify(data));
                 $("#logout").show();
                 document.cookie = "token=" + data.token;
-                startChat();
+                chat.startChat();
             }).fail(function () {
                 $("#RegLoginGroup").show();
             });
@@ -115,7 +95,8 @@ $(document).ready(function () {
                 console.log(JSON.stringify(data));
                 $("#logout").show();
                 document.cookie = "token=" + data.token;
-                startChat();
+                console.log(chat);
+                chat.startChat();
             }).fail(function () {
                 $("#RegLoginGroup").show();
             });

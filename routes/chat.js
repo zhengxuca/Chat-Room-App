@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var verify = require("./verify");
 
+
 /* GET home page. */
+/*
 router.get('/', verify.verifyOrdinaryUser, function( req, res, next) {
 
     res.status(200);
@@ -10,5 +12,5 @@ router.get('/', verify.verifyOrdinaryUser, function( req, res, next) {
     console.log("chat app");
     res.end();
 });
-
+*/
 module.exports = router;
