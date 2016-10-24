@@ -1,8 +1,8 @@
 require("../stylesheets/style.css");
 var React = require('react');
 var ReactDOM = require('react-dom');
-var chat = require("./ChatClient.js");
-
+var ChatClient = require("./ChatClient.js");
+var chat;
 
 
 var RegLogin = React.createClass(
@@ -48,6 +48,7 @@ $(document).ready(function () {
         $("#RegLoginGroup").show();
         $("#logout").hide();
         document.cookie = "";
+        chat.endChat();
     });
 
     $("#registerButton").click(function () {
@@ -62,10 +63,9 @@ $(document).ready(function () {
             };
 
             $.post("/users/register", data, function (data, status) {
-                // alert("Data: " + data + "\nStatus: " + status);
-                console.log(JSON.stringify(data));
                 $("#logout").show();
                 document.cookie = "token=" + data.token;
+                chat = new ChatClient();
                 chat.startChat();
             }).fail(function () {
                 $("#RegLoginGroup").show();
@@ -95,7 +95,7 @@ $(document).ready(function () {
                 console.log(JSON.stringify(data));
                 $("#logout").show();
                 document.cookie = "token=" + data.token;
-                console.log(chat);
+                chat = new ChatClient();
                 chat.startChat();
             }).fail(function () {
                 $("#RegLoginGroup").show();

@@ -1,12 +1,16 @@
-module.exports = new function () {
+module.exports = function () {
     this.socket = null;
     this.startChat = function () {
         var token = this.getCookie("token");
         socket = io({ query: "token=" + token });
+        socket.on("chat message", function(msg) {
+            console.log(msg);
+        });
     };
 
     this.endChat = function () {
-        socket.emit("disconnect");
+        console.log("end chat");
+        socket.emit("disconnect message");
     };
 
     this.getCookie = function (cname) {

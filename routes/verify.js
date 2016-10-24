@@ -8,25 +8,23 @@ exports.getToken = function (user) {
 
 exports.verifyOrdinaryUser = function (token) {
 
-    // decode token
     if (token) {
-        // verifies secret and checks exp
-        jwt.verify(token, config.secretKey, function (err, decoded) {
-            if (err) {
-                var err = new Error('You are not authenticated!');
-                err.status = 401;
-                return {
-                    success: false,
-                    error: err
-                };
-            } else {
-                // if everything is good, save to request for use in other routes
-                return {
-                    success: true,
-                    user: decoded
-                };
-            }
-        });
+        try {
+            // verifies secret and checks exp
+            var decoded = jwt.verify(token, config.secretKey);
+            return {
+                success: true,
+                user: decoded
+            };
+        } catch (err) {
+            console.log(err);
+            var err = new Error('You are not authenticated!');
+            err.status = 401;
+            return {
+                success: false,
+                error: err
+            };
+        }
     } else {
         // if there is no token
         // return an error
@@ -36,7 +34,6 @@ exports.verifyOrdinaryUser = function (token) {
             success: false,
             error: err
         };
-
 
     }
 };

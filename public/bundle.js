@@ -47,7 +47,8 @@
 	__webpack_require__(1);
 	var React = __webpack_require__(5);
 	var ReactDOM = __webpack_require__(34);
-	var chat = __webpack_require__(167);
+	var ChatClient = __webpack_require__(167);
+	var chat;
 
 	var RegLogin = React.createClass({
 	    displayName: 'RegLogin',
@@ -96,6 +97,7 @@
 	        $("#RegLoginGroup").show();
 	        $("#logout").hide();
 	        document.cookie = "";
+	        chat.endChat();
 	    });
 
 	    $("#registerButton").click(function () {
@@ -110,10 +112,9 @@
 	            };
 
 	            $.post("/users/register", data, function (data, status) {
-	                // alert("Data: " + data + "\nStatus: " + status);
-	                console.log(JSON.stringify(data));
 	                $("#logout").show();
 	                document.cookie = "token=" + data.token;
+	                chat = new ChatClient();
 	                chat.startChat();
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
@@ -138,7 +139,7 @@
 	                console.log(JSON.stringify(data));
 	                $("#logout").show();
 	                document.cookie = "token=" + data.token;
-	                console.log(chat);
+	                chat = new ChatClient();
 	                chat.startChat();
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
@@ -20886,7 +20887,7 @@
 /* 167 */
 /***/ function(module, exports) {
 
-	module.exports = new function () {
+	module.exports = function () {
 	    this.socket = null;
 	    this.startChat = function () {
 	        var token = this.getCookie("token");
@@ -20894,7 +20895,8 @@
 	    };
 
 	    this.endChat = function () {
-	        socket.emit("disconnect");
+	        console.log("end chat");
+	        socket.emit("disconnect message");
 	    };
 
 	    this.getCookie = function (cname) {
@@ -20911,7 +20913,7 @@
 	        }
 	        return "";
 	    };
-	}();
+	};
 
 /***/ }
 /******/ ]);
