@@ -18,11 +18,15 @@ module.exports = function (httpServer) {
     }
     );
 
-    io.on("connection", function (socket, next) {
+    io.on("connection", function (socket) {
         var username = socket.username;
         console.log('a user connected: ' + username);
+
+        socket.broadcast.emit("new user", username);
+        
         socket.on('disconnect', function () {
-            console.log('user disconnected: '+ this.username);
+            console.log('user disconnected: ' + this.username);
+            io.emit("user left", this.username);
         });
 
         socket.on("disconnect message", function () {
@@ -30,7 +34,7 @@ module.exports = function (httpServer) {
 
         });
 
-        socket.on("chat message", function(msg) {
+        socket.on("chat message", function (msg) {
             //sends message to all chat users except for the sender of the message
             socket.broadcast.emit("chat message", msg);
         });

@@ -1,23 +1,52 @@
 var React = require('react');
 
-var chatComponent = React.createClass({
-    render: function () {
+
+var UserListComponent = React.createClass({
+    render: function() {
         return (
-            <div>
+       
+        <div id="userList">
+        <h3>Online Users</h3>
+        <hr/>
+        <ul class="messages">
 
-
-            <userListComponent />
-            </div>
-
-
+        </ul>
+        </div>
         );
     }
 });
 
-var userListComponent = React.createClass({
-    render: function() {
 
+var chatComponent = React.createClass({
+    render: function () {
+        return (
+            
+            <div>
+            <div>
+
+            <div id="messageList"> 
+                <h3>Messages</h3>
+                <hr/>
+            <ul class="messages" > 
+            
+            </ul>
+    
+            </div>
+
+            <UserListComponent />
+            </div>
+
+            <form action="#">
+                <input id="inputMessage" placeholder="Enter Message" type="text" />
+                <button>Send</button>
+            </form>
+            </div>
+          
+         
+        );
     }
 });
+
+
 
 module.exports = chatComponent;

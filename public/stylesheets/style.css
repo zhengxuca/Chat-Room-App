@@ -21,8 +21,30 @@ a {
 }
 
 #ChatHolder {
-    position: absolute;
     border:4px solid blue;
-    margin: auto;
-    bottom: 10px;
+    height:500px;
+}
+
+#messageList {
+    display: inline-block; 
+    border: 2px solid black;
+    height:430px;
+    width: 80%;
+}
+
+ .messages { list-style-type: none; margin: 0; padding: 0; }
+.messages li { padding: 5px 10px; }
+.messages li:nth-child(odd) { background: #eee; }
+
+
+#userList{
+            display: inline-block; 
+    border: 2px solid lightblue;
+    height:430px;
+    width: 19%;
+}
+
+#inputMessage {
+width: 100%;
+    
 }

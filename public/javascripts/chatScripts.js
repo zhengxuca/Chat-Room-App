@@ -2,7 +2,10 @@ require("../stylesheets/style.css");
 var React = require('react');
 var ReactDOM = require('react-dom');
 var ChatClient = require("./ChatClient.js");
-var chat;
+var ChatUI = require("./ChatUI.js");
+var chatUI;
+
+var chat;//a chat client
 
 
 var RegLogin = React.createClass(
@@ -33,14 +36,26 @@ var RegLogin = React.createClass(
 );
 
 
-
-
 $(document).ready(function () {
     $("#logout").hide();
+
+    chatUI = new ChatUI();
+
     var cancel = function () {
         $("#popupHolder").hide();
         $("#RegLoginGroup").show();
     }
+
+    $('form').submit(function (event) {
+        var msg = $("#inputMessage").val();
+        if (chat &&  msg !== "") {
+            console.log("entered: " + msg);
+            chat.sendMessage(msg);
+            $("#inputMessage").val("");
+
+        }
+        event.preventDefault();
+    });
 
     $("#logout").click(function () {
         //delete token from cookies
@@ -49,6 +64,7 @@ $(document).ready(function () {
         $("#logout").hide();
         document.cookie = "";
         chat.endChat();
+        chat = null;
     });
 
     $("#registerButton").click(function () {
@@ -65,7 +81,7 @@ $(document).ready(function () {
             $.post("/users/register", data, function (data, status) {
                 $("#logout").show();
                 document.cookie = "token=" + data.token;
-                chat = new ChatClient();
+                chat = new ChatClient(chatUI, $("#usernameInput").val());
                 chat.startChat();
             }).fail(function () {
                 $("#RegLoginGroup").show();
@@ -95,7 +111,7 @@ $(document).ready(function () {
                 console.log(JSON.stringify(data));
                 $("#logout").show();
                 document.cookie = "token=" + data.token;
-                chat = new ChatClient();
+                chat = new ChatClient(chatUI, $("#usernameInput").val());
                 chat.startChat();
             }).fail(function () {
                 $("#RegLoginGroup").show();
