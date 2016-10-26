@@ -15,23 +15,26 @@ module.exports = class ChatUI {
     addMessage(msg) {
         var listItem = "<li>" + msg + "</li>";
         $("#messageList").find("ul").append(listItem);
+        $('#messageList').animate({
+            scrollTop: $('#messageList').get(0).scrollHeight
+        });
     }
-    
+
     removeAllMessages() {
         $("#messageList").find("ul li").remove();
     }
 
     addUser(username) {
-        var listItem = "<li id=\'"+username   +"\'>" + username + "</li>";
+        var listItem = "<li id=\'" + username + "\'>" + username + "</li>";
         $("#userList").find("ul").append(listItem);
     }
 
     removeUser(username) {
-         $("#userList").find("ul").find("#"+username).remove();
+        $("#userList").find("ul").find("#" + username).remove();
     }
-    
+
     removeAllUsers() {
-         $("#userList").find("ul li").remove();
+        $("#userList").find("ul li").remove();
     }
 
 }

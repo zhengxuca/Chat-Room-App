@@ -65,6 +65,8 @@ $(document).ready(function () {
         document.cookie = "";
         chat.endChat();
         chat = null;
+        chatUI.removeAllMessages();
+        chatUI.removeAllUsers();
     });
 
     $("#registerButton").click(function () {

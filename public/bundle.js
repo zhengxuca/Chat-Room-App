@@ -118,6 +118,8 @@
 	        document.cookie = "";
 	        chat.endChat();
 	        chat = null;
+	        chatUI.removeAllMessages();
+	        chatUI.removeAllUsers();
 	    });
 
 	    $("#registerButton").click(function () {
@@ -205,7 +207,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n#ChatHolder {\n    border:4px solid blue;\n    height:500px;\n}\n\n#messageList {\n    display: inline-block; \n    border: 2px solid black;\n    height:430px;\n    width: 80%;\n}\n\n .messages { list-style-type: none; margin: 0; padding: 0; }\n.messages li { padding: 5px 10px; }\n.messages li:nth-child(odd) { background: #eee; }\n\n\n#userList{\n            display: inline-block; \n    border: 2px solid lightblue;\n    height:430px;\n    width: 19%;\n}\n\n#inputMessage {\nwidth: 100%;\n    \n}", ""]);
+	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n#ChatHolder {\n    border:4px solid blue;\n    height:500px;\n}\n\n#messageList {\n    display: inline-block; \n    border: 2px solid black;\n    width: 80%;\n    overflow: scroll;\n    height:430px;\n}\n\n .messages { list-style-type: none; margin: 0; padding: 0; }\n.messages li { padding: 5px 10px; }\n.messages li:nth-child(odd) { background: #eee; }\n\n\n#userList{\n    display: inline-block; \n    border: 2px solid lightblue;\n    width: 19%;\n    overflow: scroll;\n    height:430px;\n}\n\n#inputMessage {\nwidth: 100%;\n    \n}", ""]);
 
 	// exports
 
@@ -20926,21 +20928,31 @@
 	    _createClass(ChatClient, [{
 	        key: "startChat",
 	        value: function startChat() {
+	            var _this = this;
+
 	            var token = this.getCookie("token");
 	            this.socket = io({ query: "token=" + token });
 	            this.socket.on("chat message", function (msg) {
 	                //new chat msg that arrived from the server.
-	                this.chatUI.addMessage(msg);
+	                _this.chatUI.addMessage(msg);
 	            });
-	            this.chatUI.addUser(this.username);
 
 	            this.socket.on("new user", function (newUser) {
 	                //a new user has joined the chat
-	                this.chatUI.addUser(newUser);
+	                _this.chatUI.addUser(newUser);
+	                _this.chatUI.addMessage(newUser + " has joined the chat");
+	            });
+
+	            this.socket.on("online users", function (onlineUsers) {
+	                var list = JSON.parse(onlineUsers);
+	                list.forEach(function (user) {
+	                    _this.chatUI.addUser(user);
+	                });
 	            });
 
 	            this.socket.on("user left", function (leftUser) {
-	                this.chatUI.removeUser(leftUser);
+	                _this.chatUI.removeUser(leftUser);
+	                _this.chatUI.addMessage(leftUser + " has left the chat");
 	            });
 	        }
 	    }, {
@@ -20955,7 +20967,7 @@
 	        value: function sendMessage(msg) {
 	            if (this.socket) {
 	                this.socket.emit("chat message", msg);
-	                this.chatUI.addMessage(msg);
+	                this.chatUI.addMessage(this.username + " said: " + msg);
 	            }
 	        }
 	    }, {
@@ -28629,6 +28641,9 @@
 	        value: function addMessage(msg) {
 	            var listItem = "<li>" + msg + "</li>";
 	            $("#messageList").find("ul").append(listItem);
+	            $('#messageList').animate({
+	                scrollTop: $('#messageList').get(0).scrollHeight
+	            });
 	        }
 	    }, {
 	        key: 'removeAllMessages',
@@ -28677,7 +28692,7 @@
 	                "Online Users"
 	            ),
 	            React.createElement("hr", null),
-	            React.createElement("ul", { "class": "messages" })
+	            React.createElement("ul", { className: "messages" })
 	        );
 	    }
 	});
@@ -28701,7 +28716,7 @@
 	                        "Messages"
 	                    ),
 	                    React.createElement("hr", null),
-	                    React.createElement("ul", { "class": "messages" })
+	                    React.createElement("ul", { className: "messages" })
 	                ),
 	                React.createElement(UserListComponent, null)
 	            ),

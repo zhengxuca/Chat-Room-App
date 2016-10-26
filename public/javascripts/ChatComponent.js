@@ -8,7 +8,7 @@ var UserListComponent = React.createClass({
         <div id="userList">
         <h3>Online Users</h3>
         <hr/>
-        <ul class="messages">
+        <ul className="messages">
 
         </ul>
         </div>
@@ -27,7 +27,7 @@ var chatComponent = React.createClass({
             <div id="messageList"> 
                 <h3>Messages</h3>
                 <hr/>
-            <ul class="messages" > 
+            <ul className="messages" > 
             
             </ul>
     

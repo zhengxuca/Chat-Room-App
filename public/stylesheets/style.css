@@ -28,8 +28,9 @@ a {
 #messageList {
     display: inline-block; 
     border: 2px solid black;
-    height:430px;
     width: 80%;
+    overflow: scroll;
+    height:430px;
 }
 
  .messages { list-style-type: none; margin: 0; padding: 0; }
@@ -38,10 +39,11 @@ a {
 
 
 #userList{
-            display: inline-block; 
+    display: inline-block; 
     border: 2px solid lightblue;
-    height:430px;
     width: 19%;
+    overflow: scroll;
+    height:430px;
 }
 
 #inputMessage {

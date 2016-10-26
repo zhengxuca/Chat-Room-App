@@ -22,8 +22,22 @@ module.exports = function (httpServer) {
         var username = socket.username;
         console.log('a user connected: ' + username);
 
+
+        //  io.sockets.sockets[(Object.keys(io.sockets.sockets)[0])].username
+        /*
+            io.sockets.sockets becomes an object of Sockets with ID as the key
+        */
+
+        var keys = Object.keys(io.sockets.sockets);//get an array of socket ID as Key
+        var onlineUsers = new Array(keys.length);
+        keys.forEach(function (idKey, i) {
+            var username = io.sockets.sockets[idKey].username;
+            onlineUsers[i]=username;
+        });
+
+        socket.emit("online users", JSON.stringify(onlineUsers));
         socket.broadcast.emit("new user", username);
-        
+
         socket.on('disconnect', function () {
             console.log('user disconnected: ' + this.username);
             io.emit("user left", this.username);
@@ -36,7 +50,7 @@ module.exports = function (httpServer) {
 
         socket.on("chat message", function (msg) {
             //sends message to all chat users except for the sender of the message
-            socket.broadcast.emit("chat message", msg);
+            socket.broadcast.emit("chat message", this.username+" said: "+ msg);
         });
 
     });
