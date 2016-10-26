@@ -1,6 +1,5 @@
 var React = require('react');
 
-
 var UserListComponent = React.createClass({
     render: function() {
         return (
@@ -15,7 +14,6 @@ var UserListComponent = React.createClass({
         );
     }
 });
-
 
 var chatComponent = React.createClass({
     render: function () {
@@ -46,7 +44,5 @@ var chatComponent = React.createClass({
         );
     }
 });
-
-
 
 module.exports = chatComponent;

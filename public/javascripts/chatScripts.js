@@ -3,10 +3,10 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var ChatClient = require("./ChatClient.js");
 var ChatUI = require("./ChatUI.js");
+var Utils = require("./Utils.js");
 var chatUI;
 
 var chat;//a chat client
-
 
 var RegLogin = React.createClass(
     {
@@ -28,18 +28,30 @@ var RegLogin = React.createClass(
                     <button onClick={handler}>{action}</button>
                     <button onClick={cancel}>Cancel</button>
                 </div>);
-
         }
-
     }
-
 );
 
+function initialize() {
+    chatUI = new ChatUI();
+
+    var loginInfo = Utils.getLoginInfo();
+    if (loginInfo === null || loginInfo.username === null || loginInfo.token === null) {
+        $("#logout").hide();
+    } else {
+        //has token and username, thus user is already logged in.
+        chat = new ChatClient(chatUI, loginInfo.username, loginInfo.token);
+        chat.startChat();
+        $("#logout").show();
+        $("#RegLoginGroup").hide();
+        $("#signedInUser").text("User: " + loginInfo.username);
+    }
+
+}
 
 $(document).ready(function () {
-    $("#logout").hide();
 
-    chatUI = new ChatUI();
+    initialize();
 
     var cancel = function () {
         $("#popupHolder").hide();
@@ -48,7 +60,7 @@ $(document).ready(function () {
 
     $('form').submit(function (event) {
         var msg = $("#inputMessage").val();
-        if (chat &&  msg !== "") {
+        if (chat && msg !== "") {
             console.log("entered: " + msg);
             chat.sendMessage(msg);
             $("#inputMessage").val("");
@@ -58,11 +70,9 @@ $(document).ready(function () {
     });
 
     $("#logout").click(function () {
-        //delete token from cookies
-
         $("#RegLoginGroup").show();
         $("#logout").hide();
-        document.cookie = "";
+        Utils.removeLoginInfo();
         chat.endChat();
         chat = null;
         chatUI.removeAllMessages();
@@ -75,16 +85,19 @@ $(document).ready(function () {
         var handler = function () {
             $("#popupHolder").hide();
 
+            var username = $("#usernameInput").val();
+            var password = $("#passwordInput").val();
             var data = {
-                username: $("#usernameInput").val(),
-                password: $("#passwordInput").val()
+                username: username,
+                password: password
             };
 
             $.post("/users/register", data, function (data, status) {
                 $("#logout").show();
-                document.cookie = "token=" + data.token;
-                chat = new ChatClient(chatUI, $("#usernameInput").val());
+                Utils.setLoginInfo(username, data.token);
+                chat = new ChatClient(chatUI, username, data.token);
                 chat.startChat();
+                $("#signedInUser").text("User: " + username);
             }).fail(function () {
                 $("#RegLoginGroup").show();
             });
@@ -94,8 +107,6 @@ $(document).ready(function () {
             <RegLogin action="Register" handler={handler} cancel={cancel} />,
             document.getElementById('popupHolder')
         );
-
-
     });
 
     $("#loginButton").click(function () {
@@ -104,17 +115,19 @@ $(document).ready(function () {
         var handler = function () {
             $("#popupHolder").hide();
 
+            var username = $("#usernameInput").val();
+            var password = $("#passwordInput").val();
             var data = {
-                username: $("#usernameInput").val(),
-                password: $("#passwordInput").val()
+                username: username,
+                password: password
             };
 
             $.post("/users/login", data, function (data, status) {
-                console.log(JSON.stringify(data));
                 $("#logout").show();
-                document.cookie = "token=" + data.token;
-                chat = new ChatClient(chatUI, $("#usernameInput").val());
+                Utils.setLoginInfo(username, data.token);
+                chat = new ChatClient(chatUI, username, data.token);
                 chat.startChat();
+                $("#signedInUser").text("User: " + username);
             }).fail(function () {
                 $("#RegLoginGroup").show();
             });
@@ -124,7 +137,5 @@ $(document).ready(function () {
             <RegLogin action="Login" handler={handler} cancel={cancel} />,
             document.getElementById('popupHolder')
         );
-
     });
-
 });

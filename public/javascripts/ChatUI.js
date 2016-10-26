@@ -3,13 +3,10 @@ var ReactDOM = require('react-dom');
 var ChatComponent = require("./ChatComponent");
 module.exports = class ChatUI {
     constructor() {
-
         ReactDOM.render(
             <ChatComponent />,
             document.getElementById('ChatHolder')
         );
-
-
     }
 
     addMessage(msg) {
@@ -36,6 +33,5 @@ module.exports = class ChatUI {
     removeAllUsers() {
         $("#userList").find("ul li").remove();
     }
-
 }
 

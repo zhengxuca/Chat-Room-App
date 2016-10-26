@@ -51,10 +51,10 @@
 	var ReactDOM = __webpack_require__(34);
 	var ChatClient = __webpack_require__(167);
 	var ChatUI = __webpack_require__(216);
+	var Utils = __webpack_require__(218);
 	var chatUI;
 
 	var chat; //a chat client
-
 
 	var RegLogin = React.createClass({
 	    displayName: 'RegLogin',
@@ -87,13 +87,27 @@
 	            )
 	        );
 	    }
-
 	});
 
-	$(document).ready(function () {
-	    $("#logout").hide();
-
+	function initialize() {
 	    chatUI = new ChatUI();
+
+	    var loginInfo = Utils.getLoginInfo();
+	    if (loginInfo === null || loginInfo.username === null || loginInfo.token === null) {
+	        $("#logout").hide();
+	    } else {
+	        //has token and username, thus user is already logged in.
+	        chat = new ChatClient(chatUI, loginInfo.username, loginInfo.token);
+	        chat.startChat();
+	        $("#logout").show();
+	        $("#RegLoginGroup").hide();
+	        $("#signedInUser").text("User: " + loginInfo.username);
+	    }
+	}
+
+	$(document).ready(function () {
+
+	    initialize();
 
 	    var cancel = function cancel() {
 	        $("#popupHolder").hide();
@@ -111,11 +125,9 @@
 	    });
 
 	    $("#logout").click(function () {
-	        //delete token from cookies
-
 	        $("#RegLoginGroup").show();
 	        $("#logout").hide();
-	        document.cookie = "";
+	        Utils.removeLoginInfo();
 	        chat.endChat();
 	        chat = null;
 	        chatUI.removeAllMessages();
@@ -128,16 +140,19 @@
 	        var handler = function handler() {
 	            $("#popupHolder").hide();
 
+	            var username = $("#usernameInput").val();
+	            var password = $("#passwordInput").val();
 	            var data = {
-	                username: $("#usernameInput").val(),
-	                password: $("#passwordInput").val()
+	                username: username,
+	                password: password
 	            };
 
 	            $.post("/users/register", data, function (data, status) {
 	                $("#logout").show();
-	                document.cookie = "token=" + data.token;
-	                chat = new ChatClient(chatUI, $("#usernameInput").val());
+	                Utils.setLoginInfo(username, data.token);
+	                chat = new ChatClient(chatUI, username, data.token);
 	                chat.startChat();
+	                $("#signedInUser").text("User: " + username);
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
 	            });
@@ -152,17 +167,19 @@
 	        var handler = function handler() {
 	            $("#popupHolder").hide();
 
+	            var username = $("#usernameInput").val();
+	            var password = $("#passwordInput").val();
 	            var data = {
-	                username: $("#usernameInput").val(),
-	                password: $("#passwordInput").val()
+	                username: username,
+	                password: password
 	            };
 
 	            $.post("/users/login", data, function (data, status) {
-	                console.log(JSON.stringify(data));
 	                $("#logout").show();
-	                document.cookie = "token=" + data.token;
-	                chat = new ChatClient(chatUI, $("#usernameInput").val());
+	                Utils.setLoginInfo(username, data.token);
+	                chat = new ChatClient(chatUI, username, data.token);
 	                chat.startChat();
+	                $("#signedInUser").text("User: " + username);
 	            }).fail(function () {
 	                $("#RegLoginGroup").show();
 	            });
@@ -207,7 +224,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n#ChatHolder {\n    border:4px solid blue;\n    height:500px;\n}\n\n#messageList {\n    display: inline-block; \n    border: 2px solid black;\n    width: 80%;\n    overflow: scroll;\n    height:430px;\n}\n\n .messages { list-style-type: none; margin: 0; padding: 0; }\n.messages li { padding: 5px 10px; }\n.messages li:nth-child(odd) { background: #eee; }\n\n\n#userList{\n    display: inline-block; \n    border: 2px solid lightblue;\n    width: 19%;\n    overflow: scroll;\n    height:430px;\n}\n\n#inputMessage {\nwidth: 100%;\n    \n}", ""]);
+	exports.push([module.id, "body {\n  padding: 50px;\n  font: 14px \"Lucida Grande\", Helvetica, Arial, sans-serif;\n}\n\na {\n  color: #00B7FF;\n}\n\n#popup {\n    z-index:1;\n    border:3px solid green;\n    background-color: cadetblue;\n    margin: auto;\n    width: 50%;\n}\n\n#welcome {\n      margin: auto;\n      width:50%;\n}\n\n#ChatHolder {\n    border:4px solid blue;\n    height:500px;\n}\n\n#messageList {\n    display: inline-block; \n    border: 2px solid black;\n    width: 80%;\n    overflow: scroll;\n    height:430px;\n}\n\n.messages { \n    list-style-type: none; \n    margin: 0; \n    padding: 0;\n\n}\n.messages li {\n     padding: 5px 10px; \n\n}\n.messages li:nth-child(odd) { \n    background: #eee; \n}\n\n#userList{\n    display: inline-block; \n    border: 2px solid lightblue;\n    width: 19%;\n    overflow: scroll;\n    height:430px;\n}\n\n#inputMessage {\nwidth: 100%;\n    \n}", ""]);
 
 	// exports
 
@@ -20917,12 +20934,13 @@
 
 	var io = __webpack_require__(168);
 	module.exports = function () {
-	    function ChatClient(chatUI, username) {
+	    function ChatClient(chatUI, username, token) {
 	        _classCallCheck(this, ChatClient);
 
 	        this.socket = null;
 	        this.chatUI = chatUI;
 	        this.username = username;
+	        this.token = token;
 	    }
 
 	    _createClass(ChatClient, [{
@@ -20930,7 +20948,7 @@
 	        value: function startChat() {
 	            var _this = this;
 
-	            var token = this.getCookie("token");
+	            var token = this.token;
 	            this.socket = io({ query: "token=" + token });
 	            this.socket.on("chat message", function (msg) {
 	                //new chat msg that arrived from the server.
@@ -20969,22 +20987,6 @@
 	                this.socket.emit("chat message", msg);
 	                this.chatUI.addMessage(this.username + " said: " + msg);
 	            }
-	        }
-	    }, {
-	        key: "getCookie",
-	        value: function getCookie(cname) {
-	            var name = cname + "=";
-	            var ca = document.cookie.split(';');
-	            for (var i = 0; i < ca.length; i++) {
-	                var c = ca[i];
-	                while (c.charAt(0) == ' ') {
-	                    c = c.substring(1);
-	                }
-	                if (c.indexOf(name) == 0) {
-	                    return c.substring(name.length, c.length);
-	                }
-	            }
-	            return "";
 	        }
 	    }]);
 
@@ -28735,6 +28737,60 @@
 	});
 
 	module.exports = chatComponent;
+
+/***/ },
+/* 218 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	module.exports = function () {
+	    function Utils() {
+	        _classCallCheck(this, Utils);
+	    }
+
+	    _createClass(Utils, null, [{
+	        key: "isLocalStorageEnabled",
+	        value: function isLocalStorageEnabled() {
+	            return typeof Storage !== "undefined";
+	        }
+	    }, {
+	        key: "setLoginInfo",
+	        value: function setLoginInfo(username, token) {
+	            if (this.isLocalStorageEnabled()) {
+	                localStorage.setItem("username", username);
+	                localStorage.setItem("token", token);
+	            }
+	        }
+	    }, {
+	        key: "removeLoginInfo",
+	        value: function removeLoginInfo() {
+	            if (this.isLocalStorageEnabled()) {
+	                localStorage.removeItem("username");
+	                localStorage.removeItem("token");
+	            }
+	        }
+	    }, {
+	        key: "getLoginInfo",
+	        value: function getLoginInfo() {
+	            if (this.isLocalStorageEnabled()) {
+	                var result = {
+	                    username: localStorage.getItem("username"),
+	                    token: localStorage.getItem("token")
+	                };
+	                return result;
+	            } else {
+	                return null;
+	            }
+	        }
+	    }]);
+
+	    return Utils;
+	}();
 
 /***/ }
 /******/ ]);

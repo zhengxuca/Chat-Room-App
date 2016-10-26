@@ -8,6 +8,7 @@ module.exports = function (httpServer) {
         var token = socket.request._query.token;
         var auth = verify.verifyOrdinaryUser(token);
         if (!auth.success) {
+            //could not verify user's identity
             console.log(auth.error);
             socket.disconnect();
             return;
@@ -15,15 +16,12 @@ module.exports = function (httpServer) {
         var username = auth.user._doc.username;
         socket.username = username;
         next();
-    }
-    );
+    });
 
     io.on("connection", function (socket) {
         var username = socket.username;
         console.log('a user connected: ' + username);
 
-
-        //  io.sockets.sockets[(Object.keys(io.sockets.sockets)[0])].username
         /*
             io.sockets.sockets becomes an object of Sockets with ID as the key
         */
@@ -32,7 +30,7 @@ module.exports = function (httpServer) {
         var onlineUsers = new Array(keys.length);
         keys.forEach(function (idKey, i) {
             var username = io.sockets.sockets[idKey].username;
-            onlineUsers[i]=username;
+            onlineUsers[i] = username;
         });
 
         socket.emit("online users", JSON.stringify(onlineUsers));
@@ -50,18 +48,13 @@ module.exports = function (httpServer) {
 
         socket.on("chat message", function (msg) {
             //sends message to all chat users except for the sender of the message
-            socket.broadcast.emit("chat message", this.username+" said: "+ msg);
+            socket.broadcast.emit("chat message", this.username + " said: " + msg);
         });
 
     });
 
-
     process.on('SIGINT', function () {
         console.log("closing chat server");
         io.close();
-    }
-    );
-
-
-
+    });
 }

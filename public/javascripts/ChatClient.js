@@ -1,13 +1,15 @@
 var io = require('socket.io-client');
 module.exports = class ChatClient {
 
-    constructor(chatUI, username) {
+    constructor(chatUI, username, token) {
         this.socket = null;
         this.chatUI = chatUI;
-        this.username = username;
+        this.username = username; 
+        this.token = token;
     }
+
     startChat() {
-        var token = this.getCookie("token");
+        var token = this.token;
         this.socket = io({ query: "token=" + token });
         this.socket.on("chat message", (msg) => {
             //new chat msg that arrived from the server.
@@ -42,21 +44,8 @@ module.exports = class ChatClient {
     sendMessage(msg) {
         if (this.socket) {
             this.socket.emit("chat message", msg);
-            this.chatUI.addMessage(this.username+" said: "+msg);
+            this.chatUI.addMessage(this.username + " said: " + msg);
         }
     }
-    getCookie(cname) {
-        var name = cname + "=";
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    }
+    
 }
