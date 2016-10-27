@@ -61,10 +61,8 @@ $(document).ready(function () {
     $('form').submit(function (event) {
         var msg = $("#inputMessage").val();
         if (chat && msg !== "") {
-            console.log("entered: " + msg);
             chat.sendMessage(msg);
             $("#inputMessage").val("");
-
         }
         event.preventDefault();
     });
